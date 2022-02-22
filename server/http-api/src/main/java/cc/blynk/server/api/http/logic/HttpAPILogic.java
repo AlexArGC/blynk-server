@@ -258,20 +258,15 @@ public class HttpAPILogic extends TokenBaseHttpHandler {
                 return badRequest("Requested pin doesn't exist in the app.");
             }
             if (value instanceof SinglePinStorageValue) {
-                return ok(GetBoolValueJson(((SinglePinStorageValue) value).value));
+                return ok(JsonParser.boolValueToJsonAsString(((SinglePinStorageValue) value).value));
             }
         }
 
         if (widget instanceof OnePinWidget) {
-            return ok(GetBoolValueJson(((OnePinWidget) widget).value));
+            return ok(JsonParser.boolValueToJsonAsString(((OnePinWidget) widget).value));
         }
 
         return badRequest("Requested value is not boolean.");
-    }
-
-    private String GetBoolValueJson(String value) {
-        boolean val = Integer.parseInt(value) != 0;
-        return JsonParser.valueToJsonAsString(Boolean.toString(val));
     }
 
     @GET

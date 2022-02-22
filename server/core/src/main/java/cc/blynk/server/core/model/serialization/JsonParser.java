@@ -289,6 +289,12 @@ public final class JsonParser {
         return sj.toString();
     }
 
+    public static String boolValueToJsonAsString(String value) {
+        boolean intValue = Integer.parseInt(value) != 0;
+        String stringValue = Boolean.toString(intValue);
+        return "{\"value\":\"" + stringValue + "\"}";
+    }
+
     public static String valueToJsonAsString(String value) {
         return "[\"" + value  + "\"]";
     }
