@@ -222,6 +222,59 @@ public class HttpAPILogic extends TokenBaseHttpHandler {
     }
 
     @GET
+    @Path("{token}/getBool/{pin}")
+    @Metric(HTTP_GET_PIN_DATA)
+    public Response getWidgetPinDataBoolNew(@PathParam("token") String token,
+                                        @PathParam("pin") String pinString) {
+        TokenValue tokenValue = tokenManager.getTokenValueByToken(token);
+
+        if (tokenValue == null) {
+            log.debug("Requested token {} not found.", token);
+            return badRequest("Invalid token.");
+        }
+
+        User user = tokenValue.user;
+        int deviceId = tokenValue.device.id;
+        DashBoard dash = tokenValue.dash;
+
+        PinType pinType;
+        short pin;
+
+        try {
+            pinType = PinType.getPinType(pinString.charAt(0));
+            pin = NumberUtil.parsePin(pinString.substring(1));
+        } catch (NumberFormatException | IllegalCommandBodyException e) {
+            log.debug("Wrong pin format. {}", pinString);
+            return badRequest("Wrong pin format.");
+        }
+
+        Widget widget = dash.findWidgetByPin(deviceId, pin, pinType);
+
+        if (widget == null) {
+            PinStorageValue value = user.profile.pinsStorage.get(
+                    new DashPinStorageKey(dash.id, deviceId, pinType, pin));
+            if (value == null) {
+                log.debug("Requested pin {} not found. User {}", pinString, user.email);
+                return badRequest("Requested pin doesn't exist in the app.");
+            }
+            if (value instanceof SinglePinStorageValue) {
+                return ok(GetBoolValueJson(((SinglePinStorageValue) value).value));
+            }
+        }
+
+        if (widget instanceof OnePinWidget) {
+            return ok(GetBoolValueJson(((OnePinWidget) widget).value));
+        }
+
+        return badRequest("Requested value is not boolean.");
+    }
+
+    private String GetBoolValueJson(String value) {
+        boolean val = Integer.parseInt(value) != 0;
+        return JsonParser.valueToJsonAsString(Boolean.toString(val));
+    }
+
+    @GET
     @Path("{token}/rtc")
     @Metric(HTTP_GET_PIN_DATA)
     public Response getWidgetPinData(@PathParam("token") String token) {
