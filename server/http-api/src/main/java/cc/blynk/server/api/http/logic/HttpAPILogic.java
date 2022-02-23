@@ -259,12 +259,14 @@ public class HttpAPILogic extends TokenBaseHttpHandler {
                 return badRequest("Requested pin doesn't exist in the app.");
             }
             if (value instanceof SinglePinStorageValue) {
-                return ok(JsonParser.boolValueToJsonAsString(((SinglePinStorageValue) value).value));
+                boolean boolValue = Integer.parseInt(((SinglePinStorageValue) value).value) != 0;
+                return ok(JsonParser.valueToJsonValueWrapper(boolValue));
             }
         }
 
         if (widget instanceof OnePinWidget) {
-            return ok(JsonParser.boolValueToJsonAsString(((OnePinWidget) widget).value));
+            boolean boolValue = Integer.parseInt(((OnePinWidget) widget).value) != 0;
+            return ok(JsonParser.valueToJsonValueWrapper(boolValue));
         }
 
         return badRequest("Requested value is not boolean.");
@@ -282,7 +284,6 @@ public class HttpAPILogic extends TokenBaseHttpHandler {
             return badRequest("Invalid token.");
         }
 
-        User user = tokenValue.user;
         int deviceId = tokenValue.device.id;
         DashBoard dash = tokenValue.dash;
 
@@ -300,14 +301,14 @@ public class HttpAPILogic extends TokenBaseHttpHandler {
         Widget widget = dash.findWidgetByPin(deviceId, pin, pinType);
 
         if (widget == null) {
-            return badRequest("Device must contains zeRGBe widget.");
+            return badRequest("Device must contains zeRGBe widget with merged colors.");
         }
 
-        if (widget instanceof RGB) {
-            return ok(JsonParser.rgbValueToJsonString(((RGB) widget).color));
+        if (widget instanceof RGB && !((RGB) widget).isSplitMode()) {
+            return ok(JsonParser.valueToJsonValueWrapper(((RGB) widget).getRgbValueAsInt()));
         }
 
-        return badRequest("Requested value is not boolean.");
+        return badRequest("Device must contains zeRGBe widget with merged colors.");
     }
 
     @GET

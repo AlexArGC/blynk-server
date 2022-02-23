@@ -289,19 +289,12 @@ public final class JsonParser {
         return sj.toString();
     }
 
-    public static String boolValueToJsonAsString(String value) {
-        boolean intValue = Integer.parseInt(value) != 0;
-        String stringValue = Boolean.toString(intValue);
-        return stringToJsonValueWrapper(stringValue);
-    }
+    public static String valueToJsonValueWrapper(Object value) {
+        if (value instanceof String) {
+            return "{\"value\": \"" + value + "\"}";
+        }
 
-    public static String rgbValueToJsonString(int color) {
-        String bitString = Integer.toBinaryString(color);
-        return stringToJsonValueWrapper(bitString);
-    }
-
-    private static String stringToJsonValueWrapper(String value) {
-        return "{\"value\":\"" + value + "\"}";
+        return "{\"value\": " + value + "}";
     }
 
     public static String valueToJsonAsString(String value) {
