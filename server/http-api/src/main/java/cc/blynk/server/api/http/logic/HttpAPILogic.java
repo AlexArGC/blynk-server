@@ -33,6 +33,7 @@ import cc.blynk.server.core.model.storage.value.SinglePinStorageValue;
 import cc.blynk.server.core.model.widgets.MultiPinWidget;
 import cc.blynk.server.core.model.widgets.OnePinWidget;
 import cc.blynk.server.core.model.widgets.Widget;
+import cc.blynk.server.core.model.widgets.controls.RGB;
 import cc.blynk.server.core.model.widgets.notifications.Mail;
 import cc.blynk.server.core.model.widgets.notifications.Notification;
 import cc.blynk.server.core.model.widgets.others.rtc.RTC;
@@ -264,6 +265,46 @@ public class HttpAPILogic extends TokenBaseHttpHandler {
 
         if (widget instanceof OnePinWidget) {
             return ok(JsonParser.boolValueToJsonAsString(((OnePinWidget) widget).value));
+        }
+
+        return badRequest("Requested value is not boolean.");
+    }
+
+    @GET
+    @Path("{token}/getRgb/{pin}")
+    @Metric(HTTP_GET_PIN_DATA)
+    public Response getWidgetPinDataRgbNew(@PathParam("token") String token,
+                                        @PathParam("pin") String pinString) {
+        TokenValue tokenValue = tokenManager.getTokenValueByToken(token);
+
+        if (tokenValue == null) {
+            log.debug("Requested token {} not found.", token);
+            return badRequest("Invalid token.");
+        }
+
+        User user = tokenValue.user;
+        int deviceId = tokenValue.device.id;
+        DashBoard dash = tokenValue.dash;
+
+        PinType pinType;
+        short pin;
+
+        try {
+            pinType = PinType.getPinType(pinString.charAt(0));
+            pin = NumberUtil.parsePin(pinString.substring(1));
+        } catch (NumberFormatException | IllegalCommandBodyException e) {
+            log.debug("Wrong pin format. {}", pinString);
+            return badRequest("Wrong pin format.");
+        }
+
+        Widget widget = dash.findWidgetByPin(deviceId, pin, pinType);
+
+        if (widget == null) {
+            return badRequest("Device must contains zeRGBe widget.");
+        }
+
+        if (widget instanceof RGB) {
+            return ok(JsonParser.rgbValueToJsonString(((RGB) widget).color));
         }
 
         return badRequest("Requested value is not boolean.");
