@@ -33,6 +33,7 @@ import cc.blynk.server.core.model.storage.value.SinglePinStorageValue;
 import cc.blynk.server.core.model.widgets.MultiPinWidget;
 import cc.blynk.server.core.model.widgets.OnePinWidget;
 import cc.blynk.server.core.model.widgets.Widget;
+import cc.blynk.server.core.model.widgets.controls.RGB;
 import cc.blynk.server.core.model.widgets.notifications.Mail;
 import cc.blynk.server.core.model.widgets.notifications.Notification;
 import cc.blynk.server.core.model.widgets.others.rtc.RTC;
@@ -219,6 +220,95 @@ public class HttpAPILogic extends TokenBaseHttpHandler {
         }
 
         return ok(widget.getJsonValue());
+    }
+
+    @GET
+    @Path("{token}/getBool/{pin}")
+    @Metric(HTTP_GET_PIN_DATA)
+    public Response getWidgetPinDataBoolNew(@PathParam("token") String token,
+                                        @PathParam("pin") String pinString) {
+        TokenValue tokenValue = tokenManager.getTokenValueByToken(token);
+
+        if (tokenValue == null) {
+            log.debug("Requested token {} not found.", token);
+            return badRequest("Invalid token.");
+        }
+
+        User user = tokenValue.user;
+        int deviceId = tokenValue.device.id;
+        DashBoard dash = tokenValue.dash;
+
+        PinType pinType;
+        short pin;
+
+        try {
+            pinType = PinType.getPinType(pinString.charAt(0));
+            pin = NumberUtil.parsePin(pinString.substring(1));
+        } catch (NumberFormatException | IllegalCommandBodyException e) {
+            log.debug("Wrong pin format. {}", pinString);
+            return badRequest("Wrong pin format.");
+        }
+
+        Widget widget = dash.findWidgetByPin(deviceId, pin, pinType);
+
+        if (widget == null) {
+            PinStorageValue value = user.profile.pinsStorage.get(
+                    new DashPinStorageKey(dash.id, deviceId, pinType, pin));
+            if (value == null) {
+                log.debug("Requested pin {} not found. User {}", pinString, user.email);
+                return badRequest("Requested pin doesn't exist in the app.");
+            }
+            if (value instanceof SinglePinStorageValue) {
+                boolean boolValue = Integer.parseInt(((SinglePinStorageValue) value).value) != 0;
+                return ok(JsonParser.valueToJsonValueWrapper(boolValue));
+            }
+        }
+
+        if (widget instanceof OnePinWidget) {
+            boolean boolValue = Integer.parseInt(((OnePinWidget) widget).value) != 0;
+            return ok(JsonParser.valueToJsonValueWrapper(boolValue));
+        }
+
+        return badRequest("Requested value is not boolean.");
+    }
+
+    @GET
+    @Path("{token}/getRgb/{pin}")
+    @Metric(HTTP_GET_PIN_DATA)
+    public Response getWidgetPinDataRgbNew(@PathParam("token") String token,
+                                        @PathParam("pin") String pinString) {
+        TokenValue tokenValue = tokenManager.getTokenValueByToken(token);
+
+        if (tokenValue == null) {
+            log.debug("Requested token {} not found.", token);
+            return badRequest("Invalid token.");
+        }
+
+        int deviceId = tokenValue.device.id;
+        DashBoard dash = tokenValue.dash;
+
+        PinType pinType;
+        short pin;
+
+        try {
+            pinType = PinType.getPinType(pinString.charAt(0));
+            pin = NumberUtil.parsePin(pinString.substring(1));
+        } catch (NumberFormatException | IllegalCommandBodyException e) {
+            log.debug("Wrong pin format. {}", pinString);
+            return badRequest("Wrong pin format.");
+        }
+
+        Widget widget = dash.findWidgetByPin(deviceId, pin, pinType);
+
+        if (widget == null) {
+            return badRequest("Device must contains zeRGBe widget with merged colors.");
+        }
+
+        if (widget instanceof RGB && !((RGB) widget).isSplitMode()) {
+            return ok(JsonParser.valueToJsonValueWrapper(((RGB) widget).getRgbValueAsInt()));
+        }
+
+        return badRequest("Device must contains zeRGBe widget with merged colors.");
     }
 
     @GET

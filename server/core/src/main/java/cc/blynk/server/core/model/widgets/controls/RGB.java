@@ -11,6 +11,7 @@ import static cc.blynk.server.core.protocol.enums.Command.APP_SYNC;
 import static cc.blynk.server.core.protocol.enums.Command.HARDWARE;
 import static cc.blynk.server.internal.CommonByteBufUtil.makeUTF8StringMessage;
 import static cc.blynk.utils.StringUtils.prependDashIdAndDeviceId;
+import static cc.blynk.utils.StringUtils.BODY_SEPARATOR_STRING;
 
 /**
  * The Blynk Project.
@@ -69,6 +70,38 @@ public class RGB extends MultiPinWidget implements HardwareSyncWidget {
         }
     }
 
+    public Integer getRgbValueAsInt() {
+        String[] colorsArray = new String[3];
+
+        if (isSplitMode() && dataStreams.length == 3) {
+            for (int i = 0; i < 3; i++) {
+                if (dataStreams[i].value == null) {
+                    colorsArray[i] = "0";
+                } else {
+                    colorsArray[i] = dataStreams[i].value;
+                }
+            }
+        } else {
+            if (dataStreams[0].notEmptyAndIsValid()) {
+                String[] pinValues = dataStreams[0].value.split(BODY_SEPARATOR_STRING);
+                if (pinValues.length == 3) {
+                    colorsArray = pinValues;
+                }
+            }
+        }
+
+        Integer red = getColorFromStringValue(colorsArray[0]);
+        Integer green = getColorFromStringValue(colorsArray[1]);
+        Integer blue = getColorFromStringValue(colorsArray[2]);
+
+        Integer color = 0;
+        color |= red << 16;
+        color |= green << 8;
+        color |= blue;
+
+        return color;
+    }
+
     public boolean isSplitMode() {
         return splitMode;
     }
@@ -81,6 +114,10 @@ public class RGB extends MultiPinWidget implements HardwareSyncWidget {
     @Override
     public int getPrice() {
         return 400;
+    }
+
+    private Integer getColorFromStringValue(String value) {
+        return Integer.parseInt(value) & 0xFF;
     }
 
 }

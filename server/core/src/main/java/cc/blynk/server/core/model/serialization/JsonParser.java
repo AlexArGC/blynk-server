@@ -289,6 +289,14 @@ public final class JsonParser {
         return sj.toString();
     }
 
+    public static String valueToJsonValueWrapper(Object value) {
+        if (value instanceof String) {
+            return "{\"value\": \"" + value + "\"}";
+        }
+
+        return "{\"value\": " + value + "}";
+    }
+
     public static String valueToJsonAsString(String value) {
         return "[\"" + value  + "\"]";
     }
