@@ -1,0 +1,17 @@
+echo "Updating from repo..."
+git pull
+echo "Ready"
+echo "Compiling..."
+mvn clean install -Dmaven.test.skip=true
+#mvn clean install -Dmaven.test.skip=true -Dcheckstyle.skip
+echo "Ready"
+echo "Stopping blynk service..."
+service blynk stop
+echo "Ready"
+echo "Copying new version..."
+cp server/launcher/target/server-0.41.18-SNAPSHOT.jar /blynk/server.jar
+echo "Ready"
+systemctl daemon-reload
+echo "Starting blynk service..."
+service blynk start
+echo "Ready! Newer verion installed!"

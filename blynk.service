@@ -1,0 +1,13 @@
+[Unit]
+Description=Blynk Server
+After=network.target
+StartLimitIntervalSec=0
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=root
+ExecStart=/usr/bin/java -jar /blynk/server.jar -dataFolder /blynk/data -serverConfig /blynk/server.properties
+
+[Install]
+WantedBy=multi-user.target
