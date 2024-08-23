@@ -1,6 +1,11 @@
 {
     "missions": [
         {
+            "id": "M0",
+            "title": "Join the telegram chat",
+            "answer": "check"
+        },
+        {
             "id": "M1000",
             "title": "Watch the first video on our YouTube",
             "answer": "739002"
@@ -629,6 +634,16 @@
             "id": "M2079",
             "title": "How to Earn Free Bitcoin",
             "answer": "address"
+        },
+        {
+            "id": "M2080",
+            "title": "Start Earning With Airbnb?",
+            "answer": "hacking"
+        },
+        {
+            "id": "M2081",
+            "title": "Monetize Your Hobby",
+            "answer": "geth"
         }
     ]
 }
