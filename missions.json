@@ -561,6 +561,21 @@
             "answer": "node"
         },
         {
+            "id": "M2062",
+            "title": "Make Your First $100,000",
+            "answer": "moon"
+        },
+        {
+            "id": "M2063",
+            "title": "Travel and Earn Money!",
+            "answer": "bag"
+        },
+        {
+            "id": "M2064",
+            "title": "Passive Income",
+            "answer": "network"
+        },
+        {
             "id": "M2065",
             "title": "Earn $5,000 With Chat GPT!",
             "answer": "newb"
@@ -664,6 +679,26 @@
             "id": "M2085",
             "title": "Get Free Gifts Using Loyalty Programs",
             "answer": "rebase"
+        },
+        {
+            "id": "M2086",
+            "title": "Make Money From Instagram",
+            "answer": "account"
+        },
+        {
+            "id": "M2087",
+            "title": "I Asked Companies for FREE Stuff",
+            "answer": "affiliate"
+        },
+        {
+            "id": "M2088",
+            "title": "Make Money with Your Car!",
+            "answer": "oversold"
+        },
+        {
+            "id": "M2089",
+            "title": "Millionaire-Making Crypto Exchanges!",
+            "answer": "honeypot"
         }
     ]
 }
