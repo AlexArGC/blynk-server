@@ -764,6 +764,16 @@
             "id": "M2095",
             "title": "Famous Crypto Millionaires",
             "answer": "volume"
+        },
+        {
+            "id": "M2096",
+            "title": "Selling Your Art Online",
+            "answer": "wei"
+        },
+        {
+            "id": "M2097",
+            "title": "Get Paid To Playtest",
+            "answer": "wallet"
         }
     ]
 }
